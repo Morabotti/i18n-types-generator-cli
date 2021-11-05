@@ -14,7 +14,7 @@ export enum Namespace {
 export type GroupKeys = 'test_dashboard' | 'omage' | 'alpha' | 'beta' | 'nested.nested_value' | 'nested.nested.nested_value';
 export type TestKeys = 'first' | 'second' | 'third' | 'nested.fourth' | 'nested.nested.fifth';
 
-export interface Map {
+interface Map {
   [Namespace.Group]: GroupKeys;
   [Namespace.Test]: TestKeys;
 }

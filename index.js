@@ -53,18 +53,8 @@ async function createTypeFile(languages, fileContents) {
   return file
 }
 
-function createMappingTypes() {
-  let map = `interface Map {\n`;
-  for (const [key, value] of Object.entries(fileContents)) {
-    const namespace = capitalizeWord(key);
-    map += `  [Namespace.${namespace}]: ${namespace}${keySuffix};\n`
-  }
-  map += '}\n'
-  return map;
-}
-
 function createNamespaceMap(fileContents) {
-  let map = `export interface Map {\n`;
+  let map = `interface Map {\n`;
   for (const [key, value] of Object.entries(fileContents)) {
     const namespace = capitalizeWord(key);
     map += `  [Namespace.${namespace}]: ${namespace}${keySuffix};\n`
