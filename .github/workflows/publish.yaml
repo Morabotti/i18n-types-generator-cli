@@ -1,4 +1,4 @@
-name: Publish NPM
+name: Publish
 on:
   release:
     types: [created]
@@ -13,5 +13,9 @@ jobs:
           registry-url: 'https://registry.npmjs.org'
       - run: npm install
       - run: npm publish
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+      - run: yarn
+      - run: yarn publish
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
