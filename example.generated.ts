@@ -19,14 +19,19 @@ interface Map {
   [Namespace.Test]: TestKeys;
 }
 
+interface NSMap {
+  [Namespace.Group]: `group:${GroupKeys}`;
+  [Namespace.Test]: `test:${TestKeys}`;
+}
+
 type PickMap<X extends Namespace> = Map[X];
 type PickMultiple<X extends Namespace[]> = X extends { length: 1 } ? Map[X[0]]
-  : X extends { length: 2 } ? Map[X[0]] | Map[X[1]]
-  : X extends { length: 3 } ? Map[X[0]] | Map[X[1]] | Map[X[2]]
-  : X extends { length: 4 } ? Map[X[0]] | Map[X[1]] | Map[X[2]] | Map[X[3]]
-  : X extends { length: 5 } ? Map[X[0]] | Map[X[1]] | Map[X[2]] | Map[X[3]] | Map[X[4]]
-  : X extends { length: 6 } ? Map[X[0]] | Map[X[1]] | Map[X[2]] | Map[X[3]] | Map[X[4]] | Map[X[5]]
-  : Map[X[0]] | Map[X[1]] | Map[X[2]] | Map[X[3]] | Map[X[4]] | Map[X[5]] | Map[X[6]];
+  : X extends { length: 2 } ? NSMap[X[0]] | NSMap[X[1]]
+  : X extends { length: 3 } ? NSMap[X[0]] | NSMap[X[1]] | NSMap[X[2]]
+  : X extends { length: 4 } ? NSMap[X[0]] | NSMap[X[1]] | NSMap[X[2]] | NSMap[X[3]]
+  : X extends { length: 5 } ? NSMap[X[0]] | NSMap[X[1]] | NSMap[X[2]] | NSMap[X[3]] | NSMap[X[4]]
+  : X extends { length: 6 } ? NSMap[X[0]] | NSMap[X[1]] | NSMap[X[2]] | NSMap[X[3]] | NSMap[X[4]] | NSMap[X[5]]
+  : NSMap[X[0]] | NSMap[X[1]] | NSMap[X[2]] | NSMap[X[3]] | NSMap[X[4]] | NSMap[X[5]] | NSMap[X[6]];
 
 export type TranslationMapping<X extends Namespace> = PickMap<X>;
 export type TranslationsMapping<X extends Namespace[]> = PickMultiple<X>;
