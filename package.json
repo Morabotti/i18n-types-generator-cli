@@ -1,5 +1,5 @@
 {
-  "name": "i18n-types-generator-cli",
+  "name": "@morabotti/i18n-types-generator-cli",
   "version": "0.0.1",
   "description": "Typescript type generation for i18n keys/namespaces",
   "main": "index.js",
@@ -13,10 +13,18 @@
   "license": "MIT",
   "homepage": "https://github.com/Morabotti/i18n-types-generator-cli",
   "bin": {
-    "i18n-types-generator": "./index.js"
+    "i18n-types-generator": "index.js"
   },
   "dependencies": {
     "glob": "^7.2.0",
     "yargs": "^17.2.1"
+  },
+  "devDependencies": {},
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Morabotti/i18n-types-generator-cli.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Morabotti/i18n-types-generator-cli/issues"
   }
 }
