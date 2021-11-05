@@ -1,6 +1,6 @@
 {
   "name": "i18n-types-generator-cli",
-  "version": "1.0.0",
+  "version": "0.0.1",
   "description": "Typescript type generation for i18n keys/namespaces",
   "main": "index.js",
   "scripts": {
@@ -11,6 +11,7 @@
   ],
   "author": "Jesse Batman (https://github.com/Morabotti)",
   "license": "MIT",
+  "homepage": "https://github.com/Morabotti/i18n-types-generator-cli",
   "bin": {
     "i18n-types-generator": "./index.js"
   },
