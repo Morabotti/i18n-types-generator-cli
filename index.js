@@ -33,7 +33,7 @@ const options = yargs
   const fileContents = await getFileContents(content.files);
   const typeFile = await createTypeFile(content.languages, fileContents);
   
-  fs.writeFile(path.join(__dirname, options.output), typeFile);
+  fs.writeFile(path.join(process.cwd(), options.output), typeFile);
 })()
 
 
@@ -113,7 +113,7 @@ async function getFileContents(files) {
 
 async function getContents(opts) {
   const variableRegex = /\{\{.*?\}\}/g;
-  const realPath = path.join(__dirname, opts.path);
+  const realPath = path.join(process.cwd(), opts.path);
   const matches = opts.path.match(variableRegex);
 
   if (matches === null || !(matches.includes('{{ns}}') && matches.includes('{{lang}}'))) {

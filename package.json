@@ -1,6 +1,6 @@
 {
   "name": "@morabotti/i18n-types-generator-cli",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Typescript type generation for i18n keys/namespaces",
   "main": "index.js",
   "scripts": {
