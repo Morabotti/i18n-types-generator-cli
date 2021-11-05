@@ -1,0 +1,12 @@
+{
+  "test_dashboard": "test_value",
+  "omage_dashboard": "omega_value",
+  "alpha_dashboard": "alpha_value",
+  "beta_dashboard": "beta_value",
+  "nested": {
+    "nested_value": "dssdadasdsa",
+    "nested": {
+      "nested_value": "dssdadasdsa"
+    }
+  }
+}
