@@ -5,7 +5,11 @@ Especially designed for `react-i18next` while using `HttpApi`
 ## Install
 Install as dev dependency:
 ```
-npm install -g @morabotti/i18n-types-generator-cli
+npm install -D @morabotti/i18n-types-generator-cli
+```
+Or with yarn:
+```
+yarn add -D @morabotti/i18n-types-generator-cli
 ```
 
 ## Usage
