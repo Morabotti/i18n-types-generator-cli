@@ -1,10 +1,11 @@
 {
   "name": "@morabotti/i18n-types-generator-cli",
-  "version": "0.0.3",
+  "version": "0.1.0",
   "description": "Typescript type generation for i18n keys/namespaces",
   "main": "index.js",
   "scripts": {
-    "start": "i18n-types-generator -p \"locales/{{lang}}/{{ns}}.json\" -o \"example.generated.ts\""
+    "start": "i18n-types-generator -p \"locales/{{lang}}/{{ns}}.json\" -o \"example.generated.ts\"",
+    "watch": "nodemon --exec \"npm run start\" --watch locales"
   },
   "keywords": [
     "i18n"
@@ -19,7 +20,9 @@
     "glob": "^7.2.0",
     "yargs": "^17.2.1"
   },
-  "devDependencies": {},
+  "devDependencies": {
+    "nodemon": "^2.0.14"
+  },
   "repository": {
     "type": "git",
     "url": "https://github.com/Morabotti/i18n-types-generator-cli.git"

@@ -7,20 +7,34 @@ export enum Language {
 }
 
 export enum Namespace {
+  CombineCaseTestOne = 'combine_case-test-_one',
   Group = 'group',
+  KebabCase = 'kebab-case',
+  SnakeCase = 'snake_case',
   Test = 'test'
 }
 
+export type CombineCaseTestOneKeys = 'key';
 export type GroupKeys = 'test_dashboard' | 'omage' | 'alpha' | 'beta' | 'nested.nested_value' | 'nested.nested.nested_value';
+export type KebabCaseKeys = 'key-kebab';
+export type SnakeCaseKeys = 'key_snake';
 export type TestKeys = 'first' | 'second' | 'third' | 'nested.fourth' | 'nested.nested.fifth';
 
+export type TranslationKey = CombineCaseTestOneKeys | GroupKeys | KebabCaseKeys | SnakeCaseKeys | TestKeys;
+
 interface Map {
+  [Namespace.CombineCaseTestOne]: CombineCaseTestOneKeys;
   [Namespace.Group]: GroupKeys;
+  [Namespace.KebabCase]: KebabCaseKeys;
+  [Namespace.SnakeCase]: SnakeCaseKeys;
   [Namespace.Test]: TestKeys;
 }
 
 interface NSMap {
+  [Namespace.CombineCaseTestOne]: `combine_case-test-_one:${CombineCaseTestOneKeys}`;
   [Namespace.Group]: `group:${GroupKeys}`;
+  [Namespace.KebabCase]: `kebab-case:${KebabCaseKeys}`;
+  [Namespace.SnakeCase]: `snake_case:${SnakeCaseKeys}`;
   [Namespace.Test]: `test:${TestKeys}`;
 }
 

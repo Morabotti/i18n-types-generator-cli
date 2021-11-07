@@ -28,14 +28,26 @@ const options = yargs
     describe: 'Default language',
     type: 'string'
    })
+   .option('d', {
+    alias: 'delimiter',
+    describe: 'Namespace delimiter in types',
+    type: 'string',
+    default: ':'
+   })
    .argv;
 
 (async () => {
   const content = await getContents(options);
   const fileContents = await getFileContents(content.files);
   const typeFile = await createTypeFile(content.languages, fileContents);
-  
-  fs.writeFile(path.join(process.cwd(), options.output), typeFile);
+
+  const writeFile = path.join(process.cwd(), options.output);
+  try {
+    fs.writeFile(writeFile, typeFile);
+  }
+  catch (e) {
+    throw new Error(`Could not write file: ${writeFile}\n${e}`)
+  }
 })()
 
 
@@ -44,7 +56,9 @@ async function createTypeFile(languages, fileContents) {
   let file = ``;
 
   file += `${staticHeader}\n`;
-  file += `${await createLanguageEnum(languages)}\n`;
+  if (languages.length !== 0) {
+    file += `${await createLanguageEnum(languages)}\n`;
+  }
   file += `${await createNamespaceEnum(namespaces)}\n`;
   file += `${createKeyTypes(fileContents)}\n`;
   file += `${createMap(singleMap, fileContents, false)}\n`;
@@ -59,9 +73,9 @@ async function createTypeFile(languages, fileContents) {
 function createMap(mapName, fileContents, includeKey) {
   let map = `interface ${mapName} {\n`;
   for (const [key, value] of Object.entries(fileContents)) {
-    const namespace = capitalizeWord(key);
+    const namespace = convertToPascal(key);
     map += `  [Namespace.${namespace}]: ${includeKey
-      ? `\`${key}:$\{${namespace}${keySuffix}}\``
+      ? `\`${key}${options.delimiter}$\{${namespace}${keySuffix}}\``
       : `${namespace}${keySuffix}`};\n`;
   }
   map += '}\n';
@@ -70,17 +84,21 @@ function createMap(mapName, fileContents, includeKey) {
 
 function createKeyTypes(fileContents) {
   let types = ``;
+  let typeNames = [];
+
   for (const [key, value] of Object.entries(fileContents)) {
-    const typeName = `${capitalizeWord(key)}${keySuffix}`;
+    const typeName = `${convertToPascal(key)}${keySuffix}`;
+    typeNames.push(typeName);
     types += `export type ${typeName} = ${value.map(i => `'${i}'`).join(' | ')};\n`;
   }
+  types += `\nexport type TranslationKey = ${typeNames.map(i => `${i}`).join(' | ')};\n`;
   return types;
 }
 
 function createNamespaceEnum(namespaces) {
   return createEnum(
     'Namespace',
-    namespaces.map(ns => [capitalizeWord(ns), ns]),
+    namespaces.map(ns => [convertToPascal(ns), ns]),
     true
   );
 }
@@ -88,7 +106,7 @@ function createNamespaceEnum(namespaces) {
 function createLanguageEnum(languages) {
   return createEnum(
     'Language',
-    languages.map(lang => [capitalizeWord(lang), lang]),
+    languages.map(lang => [convertToPascal(lang), lang]),
     true
   );
 }
@@ -96,9 +114,9 @@ function createLanguageEnum(languages) {
 function createEnum(enumName, rows, exported = false) {
   let enumText = exported ? `export enum ${enumName} {\n` : `enum ${enumName} {\n`;
   for (const [i, row] of rows.entries()) {
-    enumText += `  ${row[0]} = '${row[1]}'${i !== rows.length - 1 ? ',' : ''}\n`
+    enumText += `  ${row[0]} = '${row[1]}'${i !== rows.length - 1 ? ',' : ''}\n`;
   }
-  enumText += `}\n`
+  enumText += `}\n`;
   return enumText;
 }
 
@@ -121,37 +139,49 @@ async function getContents(opts) {
   const realPath = path.join(process.cwd(), opts.path);
   const matches = opts.path.match(variableRegex);
 
-  if (matches === null || !(matches.includes('{{ns}}') && matches.includes('{{lang}}'))) {
-    throw new Error('No {{ns}} (namespace) or {{lang}} (language) found.');
+  if (matches === null || !matches.includes('{{ns}}')) {
+    throw new Error('No {{ns}} (namespace) found.');
   }
-  
-  const beforeLang = realPath.substring(0, realPath.indexOf('{{lang}}'));
-  const langFolderContents = await fs.readdir(beforeLang, { withFileTypes: true });
-  const languages = langFolderContents
-    .filter(item => item.isDirectory())
-    .map(item => item.name);
 
-  const defaultLang = opts.lang || languages[0] || null;
-  if (defaultLang === null) {
+  const includesLang = matches.includes('{{lang}}');
+  let languages = [];
+  let defaultLang = null;
+  
+  if (matches.includes('{{lang}}')) {
+    const beforeLang = realPath.substring(0, realPath.indexOf('{{lang}}'));
+    const langFolderContents = await fs.readdir(beforeLang, { withFileTypes: true });
+    languages = langFolderContents
+      .filter(item => item.isDirectory())
+      .map(item => item.name);
+
+    defaultLang = opts.lang || languages[0] || null;
+  }
+
+  if (includesLang && defaultLang === null) {
     throw new Error('No valid language found.');
   }
 
-  const populateNamespacePath = realPath
-    .replace('{{lang}}', defaultLang)
-    .replace('{{ns}}', '*');
+  const populateNamespacePath = includesLang
+    ? realPath.replace('{{lang}}', defaultLang).replace('{{ns}}', '*')
+    : realPath.replace('{{ns}}', '*');
+  
+  try {
+    const namespaceFolder = glob.sync(populateNamespacePath);
+    const files = namespaceFolder.map(file => {
+      const filename = file.replace(/^.*[\\\/]/, '');
+      return {
+        path: file,
+        namespace: path.parse(filename).name.toLowerCase()
+      };
+    });
 
-  const namespaceFolder = glob.sync(populateNamespacePath);
-  const files = namespaceFolder.map(file => {
-    const filename = file.replace(/^.*[\\\/]/, '');
     return {
-      path: file,
-      namespace: path.parse(filename).name.toLowerCase()
+      languages,
+      files
     };
-  });
-
-  return {
-    languages,
-    files
+  }
+  catch (e) {
+    throw new Error(`Failed to read namespaces from "${populateNamespacePath}\n${e}"`);
   }
 }
 
@@ -174,6 +204,24 @@ function propertiesToArray(obj) {
 
 function capitalizeWord(str) {
   return `${str.charAt(0).toUpperCase()}${str.slice(1)}`;
+}
+
+function formatPascal(input, separator){
+  return input.split(separator).map(capitalizeWord).join('');
+}
+
+function convertToPascal(str) {
+  let name = capitalizeWord(str);
+
+  if (name.includes('_')) {
+    name = formatPascal(name, '_');
+  }
+
+  if (name.includes('-')) {
+    name = formatPascal(name, '-');
+  }
+
+  return name;
 }
 
 const staticTypes = (single, multi) => `type PickMap<X extends Namespace> = ${single}[X];
